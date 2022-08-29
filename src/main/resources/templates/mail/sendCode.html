@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>丑小鸭博客验证码</title>
+</head>
+<body>
+<div>
+    <p>
+        <b th:text="${email}"></b>, 您好!
+    </p>
+    <p>
+        您正在修改丑小鸭博客网账号密码, 这是您的验证码:<b th:text="${code}" style="font-weight: 600;color: red"></b>,
+        5分钟内有效。
+    </p>
+</div>
+</body>
+</html>

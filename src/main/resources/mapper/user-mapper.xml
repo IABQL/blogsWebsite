@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blogswebsite.mapper.UserMapper">
+    <select id="selectById" resultType="User">
+        select id, username, password, salt, email, type, states, header_url, create_time
+        from user
+        where id = #{id}
+    </select>
+
+
+    <select id="selectByEmail" resultType="User">
+        select id, username, password, salt, states, header_url
+        from user
+        where email = #{email}
+    </select>
+
+    <!--修改头像-->
+    <update id="updateHeader">
+        update user set header_url = #{url} where id = #{id}
+    </update>
+</mapper>

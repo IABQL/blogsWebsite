@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blogswebsite.mapper.BackBlogMapper">
+    <sql id="selectFields">
+        id, title, blogExplain, htmlContent, blogCover, createTime, userId, type, states
+    </sql>
+
+    <!-- useGeneratedKeys="true"开启返回自增id值,赋值给对应Blog的id属性 ；parameterType="Blog"传入的是Blog类型-->
+    <insert id="insertBlog" parameterType="Blog" keyProperty="id" useGeneratedKeys="true" >
+        insert into blog ( title, blogExplain, htmlContent,content, blogCover, createTime, userId, type, states)
+        values(#{title}, #{blogExplain}, #{htmlContent},#{content}, #{blogCover}, #{createTime}, #{userId}, #{type}, #{states})
+    </insert>
+
+    <!--删除blog-->
+    <delete id="deleteBlog">
+        delete from blog where id = #{blogId}
+    </delete>
+
+    <!--修改博客-->
+    <update id="updateBlog" parameterType="Blog">
+        update blog set
+            title = #{title}, blogExplain = #{blogExplain}, htmlContent = #{htmlContent},content = #{content},states = #{states}
+            <if test="blogCover!=null">
+            ,blogCover = #{blogCover}
+            </if>
+        where id = #{id}
+    </update>
+
+
+    <!-- 查询tag collection="array"：遍历数组；collection="list"：遍历List集合-->
+    <select id="selectBlogTags" resultType="Integer">
+        select id from tag where name in
+             <foreach item="tags" collection="array" separator="," open="(" close=")" index="">
+              #{tags}
+            </foreach>
+    </select>
+
+    <!-- 添加blog的tag到blog-tag关系表中 -->
+    <insert id="insertBlogTag">
+        insert into tagblogrelation ( blogId, tagId, userId)
+        values
+        <foreach collection="list" item="item" separator=",">
+            ( #{blogId}, #{item}, #{userId} )
+        </foreach>
+    </insert>
+
+    <!--删除标签-->
+    <delete id="deleteBlogTag">
+        delete from tagblogrelation where blogId = #{blogId}
+    </delete>
+
+
+    <!-- 根据userId获取所有博客 -->
+    <select id="selectBlogByUserId" resultType="java.util.HashMap">
+        select id, title, createTime, type from blog
+            where userId = #{userId} and states = #{states}
+            <if test="fromDate!=null">
+                and createTime between #{fromDate}  and #{toDate}
+            </if>
+            limit #{currentPag},9
+    </select>
+
+
+    <!-- 根据userId、tagId、states分页查询 -->
+    <select id="selectBlogByUserIdTag" resultType="java.util.HashMap">
+        select id, title, createTime, type from blog
+            where id
+                in (select blogId from tagblogrelation where userId = #{userId} and tagId = #{tagId})
+                and states = #{states}
+                <if test="fromDate!=null">
+                    and createTime between #{fromDate}  and #{toDate}
+                </if>
+                limit #{currentPag},9
+    </select>
+
+    <!-- 查询blog总数目(按照已发表与草稿区分) -->
+    <select id="selectTotalBlogByUserId" resultType="int">
+        select  count(*) from blog where userId = #{userId} and states = #{states}
+    </select>
+
+    <!-- 查询blog所属标签 -->
+    <select id="selectTagsByBlogId" resultType="String">
+        select name from tag where id in (select tagId from tagblogrelation where blogId = #{id})
+    </select>
+
+    <!-- 修改blog置顶状态 -->
+    <update id="updateBlogType">
+        update blog set type = #{type} where id = #{blogId}
+    </update>
+
+    <!-- 查询某篇博客信息-->
+    <select id="selectBlogAllByBlogId" resultType="java.util.HashMap">
+        select id,title,blogExplain,content,blogCover from blog where id = #{blogId}
+    </select>
+
+    <!-- 根据标签名查询其id -->
+    <select id="selectTagId" resultType="int">
+        select id from tag where name = #{tag}
+    </select>
+
+    <!-- 根据关键词搜寻用户的blog -->
+    <select id="selectBlogByUserIdKey" resultType="java.util.HashMap">
+        select id, title, createTime, type from blog
+        where userId = #{userId} and states = 0 and title like '%${key}%'
+        limit #{currentPag},9
+    </select>
+
+    <!-- 搜寻用户的草稿blog -->
+    <select id="selectDraftBlog" resultType="java.util.HashMap">
+        select id, title, createTime from blog where userId = #{userId} and states = 1;
+    </select>
+
+
+    <update id="updateCommentSates">
+        update comment set states = 1 where id in (
+            <foreach collection="list" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+    </update>
+</mapper>
