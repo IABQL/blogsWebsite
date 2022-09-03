@@ -23,8 +23,8 @@ public class UpLoad {
     // Endpoint以北京，其它Region请按实际情况填写。
     private String endpoint = "oss-cn-beijing.aliyuncs.com";
     // 阿里云账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM用户进行API访问或日常运维，请登录RAM控制台创建RAM用户。
-    private String accessKeyId = "LTAI5tLJDTEmVekc3Rq7UXzJ";
-    private String accessKeySecret = "boeDf4p3IaD4SLoEpM4oxRS6Yar9ZE";
+    private String accessKeyId = "xxxxxx";
+    private String accessKeySecret = "xxxxxxx";
     // 填写Bucket名称，例如examplebucket。
     private String bucketName = "blogs-community";
 
